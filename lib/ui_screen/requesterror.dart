@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news_weather_app/theme_data/colors.dart';
-import 'package:flutter_news_weather_app/provider/weather_provider.dart';
+import 'package:flutter_news_weather_app/provider/weatherprovider.dart';
 
 import 'package:material_floating_search_bar_2/material_floating_search_bar_2.dart';
 import 'package:provider/provider.dart';

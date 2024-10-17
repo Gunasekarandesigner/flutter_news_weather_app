@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:country_picker/country_picker.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_news_weather_app/models/geocode.dart';
-import 'package:flutter_news_weather_app/models/news_model.dart';
+import 'package:flutter_news_weather_app/models/newsmodel.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/additionalweatherdata.dart';
 import '../models/dailyweather.dart';
@@ -101,7 +99,6 @@ class WeatherProvider with ChangeNotifier {
       currentLocation = LatLng(locData.latitude, locData.longitude);
       await getCurrentWeather(currentLocation!);
       await getDailyWeather(currentLocation!);
-      await fetchNewsBasedOnWeather();
     } catch (e) {
       isRequestError = true;
     } finally {
@@ -143,24 +140,13 @@ class WeatherProvider with ChangeNotifier {
       final response = await dio.get(dailyUrl);
 
       if (response.statusCode == 200) {
-        // Parse the JSON response
         final data = response.data;
         if (data != null && data['list'] != null) {
           final List<dynamic> forecastList = data['list'];
-          print(
-              'Forecast list: $forecastList'); // Print the list to check its structure
 
-          // Print one forecast item for debugging
-          if (forecastList.isNotEmpty) {
-            print('First forecast JSON: ${forecastList[0]}');
-          }
-
-          // Map each forecast to DailyWeather and set the list
           dailyWeather = forecastList
               .map((dailyJson) => DailyWeather.fromDailyJson(dailyJson))
               .toList();
-          print(
-              'Mapped dailyWeather list: $dailyWeather'); // Print the mapped model list
         }
       } else {
         isRequestError = true;
@@ -173,7 +159,7 @@ class WeatherProvider with ChangeNotifier {
     }
   }
 
-  // 6. Search weather by location name
+  // 5. Search weather by location name
   Future<void> searchWeather(String location) async {
     isLoading = true;
     notifyListeners();
@@ -187,7 +173,9 @@ class WeatherProvider with ChangeNotifier {
         await getDailyWeather(geoCodeData.latLng);
 
         weather!.city = geoCodeData.name;
-      } else {}
+      } else {
+        isSearchError = true;
+      }
     } catch (e) {
       isSearchError = true;
     } finally {
@@ -196,70 +184,71 @@ class WeatherProvider with ChangeNotifier {
     }
   }
 
-  // 7. Toggle between Celsius and Fahrenheit
+  // 6. Toggle between Celsius and Fahrenheit
   void switchTempUnit() {
     isCelsius = !isCelsius;
     notifyListeners();
   }
 
-  // 8. Fetch News Based on Current Location and Weather Condition
-Future<void> fetchNewsBasedOnWeather() async {
-  isLoading = true;
-  isRequestError = false;
-  notifyListeners();
-
-  try {
-    String newsKey = "pub_56344505f9b3df56d40c61693d7a01fa5ab70";
-    String newsUrl =
-        "https://newsdata.io/api/1/news?apikey=$newsKey&country=in&language=ta&category=politics,environment";
-
-    final response = await dio.get(newsUrl,options: Options(headers: {"apikey":newsKey}));
-
-    if (response.statusCode == 200) {
-      final newsData = response.data;
-
-      if (newsData['status'] == 'success' && newsData['results'] != null) {
-        final List<dynamic> articles = newsData['results'];
-
-        articleList = articles.map((article) => Article.fromJson(article)).toList();
-            } else {
-        isRequestError = true;
-        print("Error occurred while fetching news");
-      }
-    } else {
-      isRequestError = true;
-      print("Error fetching news: ${response.statusCode}");
-    }
-  } on DioException catch (error) {
-    isRequestError = true;
-    print("Network error occurred: ${error.message}");
-  } catch (error) {
-    isRequestError = true;
-    print("An error occurred: $error");
-  } finally {
-    isLoading = false;
+  // 7. Fetch News Based on Current Location and Weather Condition
+  Future<void> fetchNewsBasedOnWeather(
+    String selectedLanguages,
+    List<String> selectedCategories,
+  ) async {
+    isLoading = true;
+    isRequestError = false;
     notifyListeners();
-  }
-}
-
-  Future<String?> getCountryFromLocation(LatLng location) async {
     try {
-      final geocodeUrl =
-          'http://api.openweathermap.org/geo/1.0/reverse?lat=${location.latitude}&lon=${location.longitude}&limit=1&appid=$apiKey';
-      final response = await dio.get(geocodeUrl);
+      String mood;
+      String newsKey = "pub_56344e280290d6efcba20263847c87369f27d";
+      String categoryQuery = selectedCategories.isNotEmpty
+          ? selectedCategories.join(',').toLowerCase()
+          : '';
 
-      if (response.statusCode == 200 && response.data is List) {
-        final countryData = response.data[0] as Map<String, dynamic>;
-        return countryData['country']
-            as String; 
+      if (weather != null) {
+        if (weather!.temp < 15) {
+          mood = "Depression"; // Cold weather
+        } else if (weather!.temp >= 15 && weather!.temp < 25) {
+          mood = "Happy"; // Cool weather
+        } else {
+          mood = "Fear"; // Hot weather
+        }
+      } else {
+        mood = "Normal"; // Default mood
       }
+
+      String newsUrl =
+          "https://newsdata.io/api/1/news?apikey=$newsKey&q=$mood&country=in&language=$selectedLanguages&category=$categoryQuery";
+
+      final response = await dio.get(newsUrl,
+          options: Options(headers: {
+            "apikey": newsKey,
+          }));
+
+      if (response.statusCode == 200) {
+        final newsData = response.data;
+
+        if (newsData['status'] == 'success' && newsData['results'] != null) {
+          final List<dynamic> articles = newsData['results'];
+          articleList =
+              articles.map((article) => Article.fromJson(article)).toList();
+        } else {
+          isRequestError = true;
+        }
+      } else {
+        isRequestError = true;
+      }
+    } on DioException {
+      isRequestError = true;
     } catch (error) {
-      print('Error fetching country from location: $error');
+      isRequestError = true;
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
-    return null;
   }
 
-  // 9. Fetch LatLng from location name using GeoCode API
+//8 Fetch Lat long
   Future<GeoCodeData?> locationToLatLng(String location) async {
     try {
       String url =
@@ -267,35 +256,15 @@ Future<void> fetchNewsBasedOnWeather() async {
 
       final response = await dio.get(url);
       if (response.statusCode == 200 && response.data is List) {
-        return GeoCodeData.fromJson(response.data[0] as Map<String, dynamic>);
-      }
-    } catch (e) {
-      return null;
-    }
-    return null;
-  }
+        List<dynamic> jsonList = response.data;
 
-  Future<List<GeoCodeData>> getLocationSuggestions(String query) async {
-    List<GeoCodeData> suggestions = [];
-
-    if (query.isEmpty) {
-      return suggestions;
-    }
-
-    try {
-      final response = await dio.get(
-          'http://api.openweathermap.org/geo/1.0/direct?q=$query&limit=5&appid=$apiKey');
-
-      if (response.statusCode == 200) {
-        suggestions = (response.data as List)
-            .map((location) => GeoCodeData.fromJson(location))
-            .toList();
+        if (jsonList.isNotEmpty) {
+          return GeoCodeData.fromJson(jsonList.first);
+        }
       }
     } catch (error) {
-      isLoading = false;
       isRequestError = true;
     }
-
-    return suggestions;
+    return null;
   }
 }

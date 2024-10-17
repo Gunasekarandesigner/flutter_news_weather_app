@@ -1,8 +1,6 @@
-
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_weather_app/provider/weather_provider.dart';
-import 'package:flutter_news_weather_app/theme_data/colors.dart';
+import 'package:flutter_news_weather_app/provider/weatherprovider.dart';
 import 'package:flutter_news_weather_app/theme_data/textstyle.dart';
 import 'package:flutter_news_weather_app/widgets/customshimmer.dart';
 import 'package:intl/intl.dart';
@@ -35,16 +33,16 @@ class WeatherInfoHeader extends StatelessWidget {
                           child: RichText(
                             textAlign: TextAlign.start,
                             text: TextSpan(
-                              text: '${weatherProv.weather?.city??""}, ',
+                              text: '${weatherProv.weather?.city ?? ""}, ',
                               style: semiboldText,
                               children: [
                                 TextSpan(
                                   text: Country.tryParse(
-                                          weatherProv.weather?.countryCode??"")
+                                          weatherProv.weather?.countryCode ??
+                                              "")
                                       ?.name,
                                   style: regularText.copyWith(fontSize: 18.0),
                                 ),
-
                               ],
                             ),
                           ),
@@ -96,7 +94,7 @@ class WeatherInfoHeader extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8.0),
                                       color: weatherProv.isLoading
                                           ? Colors.grey
-                                          : primaryBlue,
+                                          : Colors.grey.shade600,
                                     ),
                                   ),
                                   Container(
@@ -135,7 +133,7 @@ class WeatherInfoHeader extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8.0),
                                       color: weatherProv.isLoading
                                           ? Colors.grey
-                                          : primaryBlue,
+                                          : Colors.grey.shade600,
                                     ),
                                   ),
                                 ],

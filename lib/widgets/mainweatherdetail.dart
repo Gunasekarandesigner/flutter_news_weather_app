@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_news_weather_app/helper/extensions.dart';
-import 'package:flutter_news_weather_app/provider/weather_provider.dart';
+import 'package:flutter_news_weather_app/provider/weatherprovider.dart';
 
 import 'package:flutter_news_weather_app/widgets/customshimmer.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';

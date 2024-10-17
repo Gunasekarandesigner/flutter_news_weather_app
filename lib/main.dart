@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_news_weather_app/provider/weather_provider.dart';
+import 'package:flutter_news_weather_app/provider/weatherprovider.dart';
 
 import 'package:flutter_news_weather_app/ui_screen/homescreen.dart';
 import 'package:flutter_news_weather_app/ui_screen/fivedaysforecastdetailscreen.dart';

@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 import '../helper/utils.dart';
 
 import '../models/dailyweather.dart';
-import '../provider/weather_provider.dart';
+import '../provider/weatherprovider.dart';
 
 class FiveDaysForecastDetail extends StatefulWidget {
   static const routeName = '/fiveDaysForecast';
@@ -56,11 +56,41 @@ class _FiveDaysForecastDetailState extends State<FiveDaysForecastDetail> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
+       appBar: AppBar(
+        leading: IconButton(
+          icon: const PhosphorIcon(
+            PhosphorIconsBold.arrowCircleLeft,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.black,
+                Colors.amber.shade400,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(20.0),
+              bottomRight: Radius.circular(20.0),
+            ),
+          ),
+        ),
         title: const Text(
-          '5-Day Forecast',
-          style: TextStyle(color: Colors.black),
+          'Five - Days Forecast',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22.0,
+            color: Colors.white,
+            letterSpacing: 1.2,
+          ),
         ),
       ),
       body: Consumer<WeatherProvider>(

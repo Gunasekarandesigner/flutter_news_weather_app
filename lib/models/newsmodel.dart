@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 
 class News {
   final String status;
@@ -24,48 +24,48 @@ class News {
 }
 
 class Article {
-  final String articleId;
-  final String title;
-  final String link;
+  final String? articleId;
+  final String? title;
+  final String? link;
   final List<String>? keywords;
-  final String? creator;
+  final List<dynamic>? creator;
   final String? videoUrl;
   final String? description;
   final String? content;
-  final String pubDate;
-  final String pubDateTZ;
+  final DateTime? pubDate;
+  final String? pubDateTZ;
   final String? imageUrl;
-  final String sourceId;
-  final int sourcePriority;
-  final String sourceName;
-  final String sourceUrl;
-  final String sourceIcon;
-  final String language;
-  final List<String> country;
-  final List<String> category;
-  final bool duplicate;
+  final String? sourceId;
+  final int? sourcePriority;
+  final String? sourceName;
+  final String? sourceUrl;
+  final String? sourceIcon;
+  final String? language;
+  final List<String>? country;
+  final List<String>? category;
+  final bool? duplicate;
 
   Article({
-    required this.articleId,
-    required this.title,
-    required this.link,
+     this.articleId,
+     this.title,
+     this.link,
     this.keywords,
     this.creator,
     this.videoUrl,
     this.description,
     this.content,
-    required this.pubDate,
-    required this.pubDateTZ,
+     this.pubDate,
+     this.pubDateTZ,
     this.imageUrl,
-    required this.sourceId,
-    required this.sourcePriority,
-    required this.sourceName,
-    required this.sourceUrl,
-    required this.sourceIcon,
-    required this.language,
-    required this.country,
-    required this.category,
-    required this.duplicate,
+     this.sourceId,
+     this.sourcePriority,
+     this.sourceName,
+     this.sourceUrl,
+     this.sourceIcon,
+     this.language,
+     this.country,
+     this.category,
+     this.duplicate,
   });
 
   factory Article.fromJson(Map<String, dynamic> json) {
@@ -74,11 +74,13 @@ class Article {
       title: json['title']??"",
       link: json['link']??"",
       keywords: json['keywords'] != null ? List<String>.from(json['keywords']) : null,
-      creator: json['creator']??"",
+      creator: json['creator']!= null ? List<dynamic>.from(json['creator']) : null,
       videoUrl: json['video_url']??"",
       description: json['description']??"",
       content: json['content']??"",
-      pubDate: json['pubDate']??"",
+     pubDate: json['pubDate'] != null
+          ? DateTime.parse(json['pubDate'])
+          : null,
       pubDateTZ: json['pubDateTZ']??"",
       imageUrl: json['image_url']??"",
       sourceId: json['source_id']??"",
@@ -87,8 +89,8 @@ class Article {
       sourceUrl: json['source_url']??"",
       sourceIcon: json['source_icon']??"",
       language: json['language']??"",
-      country: List<String>.from(json['country']),
-      category: List<String>.from(json['category']),
+      country: json['country'] != null ? List<String>.from(json['country']) : null,
+      category:json['category'] != null ? List<String>.from(json['category']) : null,
       duplicate: json['duplicate'],
     );
   }

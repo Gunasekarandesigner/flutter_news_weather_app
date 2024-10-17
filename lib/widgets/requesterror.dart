@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_news_weather_app/provider/weather_provider.dart';
+import 'package:flutter_news_weather_app/provider/weatherprovider.dart';
 import 'package:provider/provider.dart';
 
 class RequestError extends StatelessWidget {
